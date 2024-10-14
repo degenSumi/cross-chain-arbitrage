@@ -6,7 +6,7 @@ const bs58 = require('bs58');
 
 class Listener extends EventEmitter {
     connection;
-    constructor(connection){
+    constructor(connection) {
         super()
         this.connection = connection;
     };
@@ -20,9 +20,9 @@ class Listener extends EventEmitter {
                     const currentPrice = (Math.pow(Number(current_sqrt_price) / Math.pow(2, 64), 2)) * Math.pow(10, sol_pool.token_0_decimals - sol_pool.token_1_decimals);
                     // to-do getting the actual reserves for the price impact calc, doing later on
                     // console.log('stateprice', currentPrice);
-                    const reserve_0 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.data.slice(133,165)))).value.amount;
-                    const reserve_1 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.data.slice(213,245)))).value.amount;
-                    this.emit('solpool',{
+                    const reserve_0 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.data.slice(133, 165)))).value.amount;
+                    const reserve_1 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.data.slice(213, 245)))).value.amount;
+                    this.emit('solpool', {
                         currentPriceOnSol: currentPrice,
                         reserve_0,
                         reserve_1,
@@ -30,7 +30,7 @@ class Listener extends EventEmitter {
                         liquidity: updatedAccountInfo.data.readBigUInt64LE(49),
                         pool_address: sol_pool.pool_address
                     });
-                } catch (error){
+                } catch (error) {
                     console.log(error);
                 }
             },
@@ -45,7 +45,7 @@ class Listener extends EventEmitter {
         const client = new SuiClient({
             url: 'https://fullnode.mainnet.sui.io:443',
         });
-        try {            
+        try {
             const poll = async () => {
                 try {
                     const result = await client.getObject({ options: { showContent: true, showDisplay: true }, id: sui_pool.pool_address });
@@ -57,7 +57,7 @@ class Listener extends EventEmitter {
                         reserve_0: coin_a,
                         reserve_1: coin_b,
                         pool_address: sui_pool.pool_address,
-                        liquidity  
+                        liquidity
                     });
                 } catch (error) {
                     console.error('Error fetching object state:', error);
@@ -71,55 +71,55 @@ class Listener extends EventEmitter {
     };
     // Listening to any sol-usdc raydium pool
     async subscribeToRaydiumPools() {
-            return this.connection.onProgramAccountChange(
-                MAINNET_PROGRAM_ID.AmmV4,
-                async (updatedAccountInfo) => {
-                    try {
-                        const poolState = LIQUIDITY_STATE_LAYOUT_V4.decode(updatedAccountInfo.accountInfo.data);
-                        // console.log('pool', poolState, updatedAccountInfo);
-                        const reserve_0 = (await this.connection.getTokenAccountBalance(poolState.baseVault)).value.amount;
-                        const reserve_1 = (await this.connection.getTokenAccountBalance(poolState.quoteVault)).value.amount;
+        return this.connection.onProgramAccountChange(
+            MAINNET_PROGRAM_ID.AmmV4,
+            async (updatedAccountInfo) => {
+                try {
+                    const poolState = LIQUIDITY_STATE_LAYOUT_V4.decode(updatedAccountInfo.accountInfo.data);
+                    // console.log('pool', poolState, updatedAccountInfo);
+                    const reserve_0 = (await this.connection.getTokenAccountBalance(poolState.baseVault)).value.amount;
+                    const reserve_1 = (await this.connection.getTokenAccountBalance(poolState.quoteVault)).value.amount;
 
-                        const stateprice = (reserve_1 / 10 ** poolState.quoteDecimal) / (reserve_0 / 10 ** poolState.baseDecimal);
-                        this.emit('solpool',{
-                            currentPriceOnSol: stateprice,
-                            reserve_0,
-                            reserve_1,
-                            pool_address: updatedAccountInfo.accountId.toBase58()
-                        });
-                    } catch(error) {
-                        console.log(error)
-                    }
+                    const stateprice = (reserve_1 / 10 ** poolState.quoteDecimal) / (reserve_0 / 10 ** poolState.baseDecimal);
+                    this.emit('solpool', {
+                        currentPriceOnSol: stateprice,
+                        reserve_0,
+                        reserve_1,
+                        pool_address: updatedAccountInfo.accountId.toBase58()
+                    });
+                } catch (error) {
+                    console.log(error)
+                }
+            },
+            this.connection.commitment,
+            [
+                { dataSize: LIQUIDITY_STATE_LAYOUT_V4.span },
+                {
+                    memcmp: {
+                        offset: LIQUIDITY_STATE_LAYOUT_V4.offsetOf('quoteMint'),
+                        bytes: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                    },
                 },
-                this.connection.commitment,
-                [
-                    { dataSize: LIQUIDITY_STATE_LAYOUT_V4.span },
-                    {
-                        memcmp: {
-                            offset: LIQUIDITY_STATE_LAYOUT_V4.offsetOf('quoteMint'),
-                            bytes: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-                        },
+                {
+                    memcmp: {
+                        offset: LIQUIDITY_STATE_LAYOUT_V4.offsetOf('baseMint'),
+                        bytes: "So11111111111111111111111111111111111111112",
                     },
-                    {
-                        memcmp: {
-                            offset: LIQUIDITY_STATE_LAYOUT_V4.offsetOf('baseMint'),
-                            bytes: "So11111111111111111111111111111111111111112",
-                        },
-                    },
-                    {
+                },
+                {
                     memcmp: {
                         offset: LIQUIDITY_STATE_LAYOUT_V4.offsetOf('marketProgramId'),
                         bytes: MAINNET_PROGRAM_ID.OPENBOOK_MARKET.toBase58(),
                     },
-                    },
-                    {
+                },
+                {
                     memcmp: {
                         offset: LIQUIDITY_STATE_LAYOUT_V4.offsetOf('status'),
                         bytes: bs58.encode([6, 0, 0, 0, 0, 0, 0, 0]),
                     },
-                    },
-                ],
-            );
+                },
+            ],
+        );
     };
     // Listening to any orca sol-usdc pool
     async subscribeToOrcaPools(sol_pool) {
@@ -132,16 +132,16 @@ class Listener extends EventEmitter {
                     // to-do getting the actual reserves for the price impact calc, doing later on
                     // console.log('stateprice', currentPrice);
                     const reserve = updatedAccountInfo.accountInfo.data.readBigUInt64LE(65)
-                    const reserve_0 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.accountInfo.data.slice(133,165)))).value.amount;
-                    const reserve_1 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.accountInfo.data.slice(213,245)))).value.amount;
-                    this.emit('solpool',{
+                    const reserve_0 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.accountInfo.data.slice(133, 165)))).value.amount;
+                    const reserve_1 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.accountInfo.data.slice(213, 245)))).value.amount;
+                    this.emit('solpool', {
                         currentPriceOnSol: currentPrice,
                         reserve_0,
                         reserve_1,
                         sqrtPriceX96: current_sqrt_price,
                         pool_address: updatedAccountInfo.accountId.toBase58()
                     });
-                } catch(error){
+                } catch (error) {
                     console.log(error);
                 }
             },
