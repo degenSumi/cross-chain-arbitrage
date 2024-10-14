@@ -11,28 +11,26 @@ dotenv.config();
 const jsonFilePath = path.join(__dirname, 'backtest.json');
 
 async function bactestData(arbValueUSDC) {
-    const timestamp = new Date().toISOString(); // Get the current timestamp
+    const timestamp = new Date().toISOString();
 
-    // Read the existing data from the JSON file
+    // Appending data
     let data = [];
     try {
         const fileContent = await fs.promises.readFile(jsonFilePath, 'utf-8');
-        data = JSON.parse(fileContent); // Parse existing data
+        data = JSON.parse(fileContent);
     } catch (error) {
         console.error("Could not read the JSON file:", error);
     }
 
-    // Append the new arbitrage value with timestamp
     data.push({ timestamp, arbValueUSDC });
 
-    // Write the updated data back to the JSON file
     try {
         await fs.promises.writeFile(jsonFilePath, JSON.stringify(data, null, 2));
         console.log("Arbitrage value saved successfully.");
     } catch (error) {
         console.error("Could not write to the JSON file:", error);
     }
-}
+};
 
 // sol-usdc pool to perform arbitrage on, additionally we can also use all pools of sol-usdc on orca/raydium
 const sol_pool = {
@@ -70,7 +68,6 @@ const poolInfoSui = {
         pool_address: '0x9ddb0d269d1049caf7c872846cc6d9152618d1d3ce994fae84c1c051ee23b179',
         liquidity: 2788550365743,
 };
-
 
 async function runbot(){
     const solrpc = process.env.solanarpc;
@@ -205,3 +202,4 @@ async function runbot(){
 }
 
 runbot();
+
