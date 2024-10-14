@@ -20,8 +20,8 @@ class Listener extends EventEmitter {
                     const currentPrice = (Math.pow(Number(current_sqrt_price) / Math.pow(2, 64), 2)) * Math.pow(10, sol_pool.token_0_decimals - sol_pool.token_1_decimals);
                     // to-do getting the actual reserves for the price impact calc, doing later on
                     // console.log('stateprice', currentPrice);
-                    const reserve_0 = (await connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.data.slice(133,165)))).value.amount;
-                    const reserve_1 = (await connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.data.slice(213,245)))).value.amount;
+                    const reserve_0 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.data.slice(133,165)))).value.amount;
+                    const reserve_1 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.data.slice(213,245)))).value.amount;
                     this.emit('solpool',{
                         currentPriceOnSol: currentPrice,
                         reserve_0,
@@ -35,7 +35,7 @@ class Listener extends EventEmitter {
                 }
             },
             {
-                commitment: connection.commitment
+                commitment: this.connection.commitment
             }
         )
     };
@@ -77,8 +77,8 @@ class Listener extends EventEmitter {
                     try {
                         const poolState = LIQUIDITY_STATE_LAYOUT_V4.decode(updatedAccountInfo.accountInfo.data);
                         // console.log('pool', poolState, updatedAccountInfo);
-                        const reserve_0 = (await connection.getTokenAccountBalance(poolState.baseVault)).value.amount;
-                        const reserve_1 = (await connection.getTokenAccountBalance(poolState.quoteVault)).value.amount;
+                        const reserve_0 = (await this.connection.getTokenAccountBalance(poolState.baseVault)).value.amount;
+                        const reserve_1 = (await this.connection.getTokenAccountBalance(poolState.quoteVault)).value.amount;
 
                         const stateprice = (reserve_1 / 10 ** poolState.quoteDecimal) / (reserve_0 / 10 ** poolState.baseDecimal);
                         this.emit('solpool',{
@@ -91,7 +91,7 @@ class Listener extends EventEmitter {
                         console.log(error)
                     }
                 },
-                connection.commitment,
+                this.connection.commitment,
                 [
                     { dataSize: LIQUIDITY_STATE_LAYOUT_V4.span },
                     {
@@ -132,8 +132,8 @@ class Listener extends EventEmitter {
                     // to-do getting the actual reserves for the price impact calc, doing later on
                     // console.log('stateprice', currentPrice);
                     const reserve = updatedAccountInfo.accountInfo.data.readBigUInt64LE(65)
-                    const reserve_0 = (await connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.accountInfo.data.slice(133,165)))).value.amount;
-                    const reserve_1 = (await connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.accountInfo.data.slice(213,245)))).value.amount;
+                    const reserve_0 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.accountInfo.data.slice(133,165)))).value.amount;
+                    const reserve_1 = (await this.connection.getTokenAccountBalance(new PublicKey(updatedAccountInfo.accountInfo.data.slice(213,245)))).value.amount;
                     this.emit('solpool',{
                         currentPriceOnSol: currentPrice,
                         reserve_0,
@@ -145,7 +145,7 @@ class Listener extends EventEmitter {
                     console.log(error);
                 }
             },
-            connection.commitment,
+            this.connection.commitment,
             [
                 { dataSize: 653 },
                 {
