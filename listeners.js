@@ -7,7 +7,7 @@ const bs58 = require('bs58');
 class Listener extends EventEmitter {
     connection;
     constructor(connection) {
-        super()
+        super();
         this.connection = connection;
     };
     // Listening to a single orca pool
@@ -177,4 +177,4 @@ class Listener extends EventEmitter {
 
 module.exports = {
     Listener
-}
+};
