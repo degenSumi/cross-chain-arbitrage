@@ -25,7 +25,7 @@ USDC prices are monitored in the SOL/USDC pool (other pairs can be configured). 
    
 3. **Cost Consideration**: The bot factors in bridging costs, network gas fees, and other expenses before executing trades.
    
-4. **Recursive Execution**: If a profit is still available after the first trade, the bot continues to bridge and trade recursively.
+4. **Recursive Execution**: If a profit is still available after the first trade, the bot continues to bridge and trade as it monitors all the pools in realtime.
 
 ### Technologies
 - **Wormhole Bridge**: Used for bridging assets between Solana and Sui.
