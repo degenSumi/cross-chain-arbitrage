@@ -30,7 +30,7 @@ USDC prices are monitored in the SOL/USDC pool (other pairs can be configured). 
 ### Technologies
 - **Wormhole Bridge**: Used for bridging assets between Solana and Sui.
 
-![Alt text](image.png)
+![image](https://github.com/user-attachments/assets/86b5ad88-4927-479c-94e9-a57532ba2e0d)
 
 ---
 
