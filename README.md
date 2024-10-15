@@ -1,79 +1,110 @@
-# cross-chain-arbitrage
+# Cross-Chain Arbitrage
 
-This implements a cross-chain arbitrage bot designed to identify and execute profitable trading opportunities across different pools on blockchain networks(Solana/Sui).
+This project implements a cross-chain arbitrage bot designed to identify and execute profitable trading opportunities across different pools on blockchain networks (Solana/Sui).
 
 ## Overview
 
-The Cross-Chain Arbitrage bot monitors price discrepancies of assets(SOL/USDC) across Solana and Sui networks. When a profitable arbitrage opportunity is identified, the bot automatically executes trades to capitalize on the price difference.
+The Cross-Chain Arbitrage bot monitors price discrepancies of assets (SOL/USDC) across the Solana and Sui networks. When a profitable arbitrage opportunity is identified, the bot automatically executes trades to capitalize on the price difference.
 
-Supported Dexs:
-Orca: Solana
-RaydiumV4: Solana
-Cetus: Sui
+### Supported DEXs
+- **Orca**
+- **RaydiumV4**
+- **Cetus**
 
-USDC Prices are monitored on sol<>usdc pool (any other pair can be configured) as they update on both the networks, when there is a significant difference in the prices and an opportunity is found:
-to capture usdc value, we can swap our usdc on source chain to sol and then bridge it to destination chain and convert back to USDC on the chain to get more USDC than deployed, however we can skip the native swaping on source chain and send the SOL to destination chain and get the required USDC from it, native swaping is not part of implementation yet as it focuses on cross chain part, however the cost for native swapping have been taken into account.
-When a profitable case is found, after considering all costs invloved: *bridging cost, network gas etc* the bot bridges the assets using wormhole.
+### How it Works
 
-It than recursively checks the pool state and bridges as long as there is a profit opportunity found.
+USDC prices are monitored in the SOL/USDC pool (other pairs can be configured). When there is a significant price difference across networks, the bot captures arbitrage opportunities as follows:
 
+1. **Price Monitoring**: Prices are tracked on both networks.
+2. **Swap and Bridge**: Upon detecting an opportunity, the bot can:
+   - Swap USDC for SOL on the source chain.
+   - Bridge SOL to the destination chain.
+   - Convert SOL back to USDC to generate more profit than initially deployed.
+   
+   Native swapping on the source chain can be skipped, and SOL can be sent directly to the destination chain to swap for USDC. While native swapping is not yet implemented, the cost of swapping is taken into account.
+   
+3. **Cost Consideration**: The bot factors in bridging costs, network gas fees, and other expenses before executing trades.
+   
+4. **Recursive Execution**: If a profit is still available after the first trade, the bot continues to bridge and trade recursively.
+
+### Technologies
+- **Wormhole Bridge**: Used for bridging assets between Solana and Sui.
+
+---
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
-- npm
-- Access to Solana and Sui nodes
-- Wallet with sufficient funds on supported networks
+- **Node.js** (v14 or higher)
+- **npm**
+- Access to **Solana** and **Sui** nodes (local or remote)
+- A **wallet** with sufficient funds on supported networks
+
+---
 
 ## Installation
 
 1. Clone the repository:
-   ```
+   ```bash
    git clone https://github.com/degenSumi/cross-chain-arbitrage.git
    cd cross-chain-arbitrage
    ```
 
 2. Install dependencies:
-   ```
+   ```bash
    npm install
    ```
-   or if you're using yarn:
-   ```
+   Or, if you're using yarn:
+   ```bash
    yarn install
    ```
 
 3. Configure environment variables:
-   Copy the `.env.example` file to `.env` and fill in your specific configuration details.
+   - Copy the `.env.example` file to `.env`.
+   - Fill in your specific configuration details (API keys, network settings, etc.).
+
+---
 
 ## Usage
 
-To start the arbitrage bot:
+To start the arbitrage bot, run:
 
-```
+```bash
 npm start
 ```
 
-or with yarn:
+Or with yarn:
 
-```
+```bash
 yarn start
 ```
 
+---
+
 ## Configuration
 
-Edit the `config.json` file to adjust:
+You can adjust the following settings in the `config.js` file:
 
-- Arbitrage thresholds
-- Trading amount
+- Supported **networks** and **DEXs**
+- Arbitrage **thresholds**
+- **Gas price** limits
+- **Trading pair** configurations
+
+---
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+---
+
 ## Disclaimer
 
-This software is for educational purposes only. Use at your own risk. The authors are not responsible for any financial losses incurred through the use of this software.
+This software is for **educational purposes only**. Use at your own risk. The authors are not responsible for any financial losses incurred through the use of this software.
+
+---
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
