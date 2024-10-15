@@ -10,6 +10,7 @@ dotenv.config();
 
 const jsonFilePath = path.join(__dirname, 'backtest.json');
 
+// To backtest the startegy
 async function bactestData(arbValueUSDC) {
     const timestamp = new Date().toISOString();
 
@@ -187,8 +188,8 @@ async function runbot(){
                         - Trade Amount: **${config.swapamount.toFixed(2)} SOL**`));
                         // await bactestData(arbValueUSDC);
                     }       
-                    // Execute the bridge and swap if arbitrage is profitable
-                    // Additionally swap the wsol to usdc on the destination chain, trade execution for that not part of bot yet
+                    // Execute the bridge if arbitrage is profitable
+                    // Additionally swap the wsol to usdc on the destination chain, trade execution for local swap not part of the bot yet
                     // if (arbValueUSDC > 0.1) {
                     //     await startbridge({
                     //         sendChain: "Sui",
@@ -196,7 +197,7 @@ async function runbot(){
                     //         amount: config.swapamount,
                     //         solprivatekey,
                     //         suiprivatekey,
-                    //         execute: true
+                    //         execute: true // for excuting the bridge
                     //     });
                     // }
                 } catch (error) {
