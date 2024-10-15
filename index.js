@@ -1,6 +1,6 @@
 const { Connection } = require('@solana/web3.js');
 const { Listener } = require("./listeners");
-const { startbridge } = require("./wormwhole");
+const { startbridge } = require("./wormhole");
 const chalk = require("chalk");
 const config = require("./config.json");
 const dotenv =  require('dotenv');
