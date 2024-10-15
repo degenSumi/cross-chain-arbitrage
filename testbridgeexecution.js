@@ -64,13 +64,8 @@ const suisign = require("@wormhole-foundation/sdk/platforms/sui").default;
       ? Number(await wh.getDecimals(token.chain, token.address))
       : sendChain.config.nativeTokenDecimals;
   
-    // Set this to true if you want to perform a round trip transfer
     const roundTrip = false;
-  
-    // Set this to the transfer txid of the initiating transaction to recover a token transfer
-    // And attempt to fetch details about its progress.
-    let recoverTxid = undefined;
-  
+    
     // Finally create and perform the transfer given the parameters set above
     const xfer = await tokenTransfer(
           wh,
