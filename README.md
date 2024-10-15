@@ -38,8 +38,7 @@ USDC prices are monitored in the SOL/USDC pool (other pairs can be configured). 
 
 - **Node.js** (v14 or higher)
 - **npm**
-- Access to **Solana** and **Sui** nodes (local or remote)
-- A **wallet** with sufficient funds on supported networks
+- Access to **Solana** and **Sui** rpc nodes
 
 ---
 
