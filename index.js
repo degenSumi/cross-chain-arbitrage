@@ -313,7 +313,7 @@ async function runbot(){
 
                         // Execute the destination swap after eta of the bridge tx
                         setTimeout(async () => {
-                            const tx = await web3.sendAndConfirmTransaction(connection, mainTx, [keypair]);
+                            const tx = await web3.sendAndConfirmTransaction(connection, mainTx, [Keypair.fromSecretKey(new Uint8Array(bs58.decode(process.env.solanaprivatekey)))]);
                             console.log(tx);
                             console.log('Destination swap executed:', txHash);
                         }, bridgequote.eta);

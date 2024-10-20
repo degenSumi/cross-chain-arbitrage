@@ -61,7 +61,7 @@ const clmmTestnet = {
 
 async function swapCetus(){
     const sdk = new CetusClmmSDK(clmmMainnet);
-    let sendKeypair = Ed25519Keypair.deriveKeypair(mnemonics);
+    let sendKeypair = Ed25519Keypair.deriveKeypair(process.env.suimnemonic);
     sdk.senderAddress = "0xd6f6d1c3039da63c39d4c864263d01312f61e586b3d0f216f0584b20fbc77e2f";
     const a2b = true
     const byAmountIn = true

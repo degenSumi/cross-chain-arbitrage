@@ -152,10 +152,6 @@ async function swapOrca(connection, poolData){
     //   amountOut: ${quote.estimatedAmountOut.toString()}
     //   amountOutImpact: ${quote.otherAmountThreshold.toString()}`);
 
-      if(quote.otherAmountThreshold){
-
-      }
-
       // get oracle for Orca
       const oracle = PDAUtil.getOracle(programId, whirlpool.getAddress()).publicKey;
 
@@ -244,7 +240,3 @@ swapOrca(connection, {
     token_vault_a: "EUuUbDcafPrmVTD5M6qoJAoyyNbihBhugADAxRMn5he9", // for calculating price impact and slippage
     token_vault_b: "2WLWEuKDgkDUccTpbwYp1GToYktiSB1cXvreHUwiSUVP"
 });
-
-module.exports = {
-    swapOrca
-}
