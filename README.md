@@ -1,6 +1,6 @@
 # Cross-Chain Arbitrage
 
-This project implements a cross-chain arbitrage bot designed to identify and execute profitable trading opportunities across different pools on blockchain networks (Solana/Sui).
+This project implements a cross-chain arbitrage bot designed to identify and execute profitable trading opportunities across different pools on Solana and Sui Network
 
 ## Overview
 
@@ -30,7 +30,7 @@ USDC prices are monitored in the SOL/USDC pool (other pairs can be configured). 
 ### Technologies
 - **Wormhole Bridge**: Used for bridging assets between Solana and Sui.
 
-![Alt text](image.png)
+![image](https://github.com/user-attachments/assets/86b5ad88-4927-479c-94e9-a57532ba2e0d)
 
 ---
 
@@ -38,8 +38,7 @@ USDC prices are monitored in the SOL/USDC pool (other pairs can be configured). 
 
 - **Node.js** (v14 or higher)
 - **npm**
-- Access to **Solana** and **Sui** nodes (local or remote)
-- A **wallet** with sufficient funds on supported networks
+- Access to **Solana** and **Sui** rpc nodes
 
 ---
 
@@ -63,6 +62,7 @@ USDC prices are monitored in the SOL/USDC pool (other pairs can be configured). 
 3. Configure environment variables:
    - Copy the `.env.example` file to `.env`.
    - Fill in your specific configuration details (API keys, network settings, etc.).
+   - Add threshold and swapamount in `config.json`
 
 ---
 
@@ -82,17 +82,6 @@ yarn start
 
 ---
 
-## Configuration
-
-You can adjust the following settings in the `config.js` file:
-
-- Supported **networks** and **DEXs**
-- Arbitrage **thresholds**
-- **Gas price** limits
-- **Trading pair** configurations
-
----
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -102,11 +91,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Disclaimer
 
 This software is for **educational purposes only**. Use at your own risk. The authors are not responsible for any financial losses incurred through the use of this software.
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
