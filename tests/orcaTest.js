@@ -7,7 +7,7 @@ const { buildWhirlpoolClient, PDAUtil, swapQuoteByInputToken, WhirlpoolContext }
 const { deriveATA, Percentage } = require("@orca-so/common-sdk");
 const { Transaction, SystemProgram, Keypair  } = require('@solana/web3.js');
 const bs58 = require("bs58");
-const idl = require("./artifacts/orca.json");
+const idl = require("../artifacts/orca.json");
 require('dotenv').config();
 
 const solrpc = "https://api.devnet.solana.com";
