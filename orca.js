@@ -97,7 +97,7 @@ async function swapOrca(connection, poolData){
           SystemProgram.transfer({
             fromPubkey: keypair.publicKey,
             toPubkey: inputTokenATA,
-            lamports: 2000000,
+            lamports: Number(2000000+inputAmount), // Will work for wrapping sol<>wsol
           })
         );
         if (inputToken.toBase58() === NATIVE_MINT.toBase58()) {
