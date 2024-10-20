@@ -151,5 +151,5 @@ async function swapCetus(poolData){
 
 module.exports= {
     swapCetus
-}
+};
 

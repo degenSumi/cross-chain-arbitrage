@@ -182,7 +182,7 @@ async function swapOrca(connection, poolData){
       mainTx.add(swapTransaction);
 
 
-      // If you need SOL instead of wsol
+      // If you need SOL instead of wsol, not needed for current requirement
       //   if (inputToken.mint.toBase58() === NATIVE_MINT.toBase58() && closeWSolAccount) {
       //     mainTx.add(createCloseAccountInstruction(
       //       // TOKEN_PROGRAM_ID,

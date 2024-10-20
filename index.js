@@ -57,7 +57,6 @@ const sui_pool = {
     token_1_decimals: 6,
 };
 
-
 // template poolstate
 const poolInfoSol = {
         currentPriceOnSol: 152.93974777457757, // data to init
@@ -138,7 +137,7 @@ async function runbot(){
                     // Calculate output and costs
                     const outAmount = Number(bridgequote.destinationToken.amount);
                     const outAmountInUsdc = (destinationSwap.swapOutAmount / 10 ** sui_pool.token_1_decimals); // Sus slippage
-                    let networkCost = Number(2*5000) + Number(bridgequote.relayFee.amount); // 2 signatures for bridge and swap 5000 lamports*2
+                    let networkCost = Number(2*5000); // 2 signatures for bridge and swap 5000 lamports*2
                     let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolInfoSol.currentPriceOnSol);
                     // add the swap gas on destination chain
                     networkCostInUsdc += (destinationSwap.gasUsed / (10 ** 9)) * poolInfoSui.suiNativePrice;
@@ -247,7 +246,7 @@ async function runbot(){
                     let networkCost = Number(5000);
                     let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolInfoSol.currentPriceOnSol);
                     networkCostInUsdc += ((sourceSwap.gasUsed) / (10 ** 9)) * 2.1;
-                    networkCostInUsdc += ((Number(bridgequote.relayFee.amount)) / (10 ** 8)) * poolInfoSui.currentPriceOnSui;
+                    // networkCostInUsdc += ((Number(bridgequote.relayFee.amount)) / (10 ** 8)) * poolInfoSui.currentPriceOnSui;
 
 
 

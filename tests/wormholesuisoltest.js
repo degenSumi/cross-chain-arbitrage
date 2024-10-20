@@ -11,13 +11,16 @@ const sui = require('@wormhole-foundation/sdk/sui').default;
 const solana = require('@wormhole-foundation/sdk/solana').default;
 const solanasign = require("@wormhole-foundation/sdk/platforms/solana").default;
 const suisign = require("@wormhole-foundation/sdk/platforms/sui").default;
+const path = require('path');
 const dotenv = require('dotenv');
-dotenv.config();
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 
 
 async function startbridge(options) {
 
-  const wh = await wormhole('Testnet', [solana, sui]);
+  const wh = await wormhole('Mainnet', [solana, sui]);
 
   // Grab chain Contexts
   const sendChain = wh.getChain(options.sendChain);
@@ -128,7 +131,8 @@ async function tokenTransfer(
     rcvChain,
     xfer.transfer
   );
-  // console.log(quote);
+  console.log(quote);
+  return;
  
 
   if (!options.execute)
@@ -173,12 +177,12 @@ async function tokenTransfer(
 };
 
 startbridge({
-  sendChain: "Sui",
-  rcvChain: "Solana",
-  amount: 1,
+  sendChain: "Solana",
+  rcvChain: "Sui",
+  amount: 0.934890025,
   solprivatekey: process.env.solanaprivatekey,
   suiprivatekey: process.env.suimnemonic,
-  execute: true
+  execute: false
 });
 
 // module.exports = {
