@@ -12,7 +12,10 @@ const solana = require('@wormhole-foundation/sdk/solana').default;
 const solanasign = require("@wormhole-foundation/sdk/platforms/solana").default;
 // const evmsign = require("@wormhole-foundation/sdk/platforms/evm").default;
 const suisign = require("@wormhole-foundation/sdk/platforms/sui").default;
+const path = require('path');
+const dotenv = require('dotenv');
 
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
   
 (async function () {
 

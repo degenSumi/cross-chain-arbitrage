@@ -8,7 +8,10 @@ const { deriveATA, Percentage } = require("@orca-so/common-sdk");
 const { Transaction, SystemProgram, Keypair  } = require('@solana/web3.js');
 const bs58 = require("bs58");
 const idl = require("../artifacts/orca.json");
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const solrpc = "https://api.devnet.solana.com";
 const suirpc = process.env.suirpc;

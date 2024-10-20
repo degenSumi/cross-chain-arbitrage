@@ -2,7 +2,10 @@ const BN = require('bn.js');
 const { CetusClmmSDK, Percentage, TransactionUtil, adjustForSlippage, d , printTransaction } = require("@cetusprotocol/cetus-sui-clmm-sdk");
 const { getFullnodeUrl, s } = require('@mysten/sui/client');
 const { Ed25519Keypair } = require('@mysten/sui/keypairs/ed25519');
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const SDKConfig = {
     clmmConfig: {
