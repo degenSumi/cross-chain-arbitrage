@@ -85,15 +85,15 @@ async function swapCetus(poolData){
             amount,
         })
 
-        console.log('res', {
-            estimatedAmountIn: res.estimatedAmountIn.toString(),
-            estimatedAmountOut: res.estimatedAmountOut.toString(),
-            estimatedEndSqrtprice: res.estimatedEndSqrtPrice.toString(),
-            estimatedFeeAmount: res.estimatedFeeAmount.toString(),
-            isExceed: res.isExceed,
-            a2b,
-            byAmountIn,
-        })
+        // console.log('res', {
+        //     estimatedAmountIn: res.estimatedAmountIn.toString(),
+        //     estimatedAmountOut: res.estimatedAmountOut.toString(),
+        //     estimatedEndSqrtprice: res.estimatedEndSqrtPrice.toString(),
+        //     estimatedFeeAmount: res.estimatedFeeAmount.toString(),
+        //     isExceed: res.isExceed,
+        //     a2b,
+        //     byAmountIn,
+        // })
 
         const toAmount = byAmountIn ? new BN(res.estimatedAmountOut) : new BN(res.estimatedAmountIn)
 
