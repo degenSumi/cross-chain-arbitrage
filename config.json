@@ -1,4 +1,5 @@
 {
     "threshold": ".000005",
-    "swapamount": 10
+    "swapamount": 150,
+    "token": "USDC"
 }

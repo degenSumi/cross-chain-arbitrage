@@ -3,13 +3,15 @@ const {
     Wormhole,
     amount,
     isTokenId,
-    wormhole,
+    wormhole
   } = require('@wormhole-foundation/sdk');
   
   const sui = require('@wormhole-foundation/sdk/sui').default;
   const solana = require('@wormhole-foundation/sdk/solana').default;
   const solanasign = require("@wormhole-foundation/sdk/platforms/solana").default;
   const suisign = require("@wormhole-foundation/sdk/platforms/sui").default;
+
+  const solsign = require("@wormhole-foundation/sdk-solana")
   const dotenv = require('dotenv');
   dotenv.config();
   
@@ -170,11 +172,11 @@ const {
   };
   
   // startbridge({
-  //   sendChain: "Solana",
-  //   rcvChain: "Sui",
-  //   amount: "100",
-  //   solprivatekey: "sol private key",
-  //   suiprivatekey: "sui mnemonic"
+  //   sendChain: "Sui",
+  //   rcvChain: "Solana",
+  //   amount: "1",
+  //   solprivatekey: process.env.solanaprivatekey,
+  //   suiprivatekey: process.env.suimnemonic
   // });
   
   module.exports = {
