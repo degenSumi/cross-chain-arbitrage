@@ -36,7 +36,7 @@ const {
   
     const amt = options.amount;
   
-    const automatic = true;
+    const automatic = false;
   
     const nativeGas = automatic ? '0' : undefined;
   

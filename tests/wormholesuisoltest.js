@@ -20,7 +20,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 async function startbridge(options) {
 
-  const wh = await wormhole('Mainnet', [solana, sui]);
+  const wh = await wormhole('Testnet', [solana, sui]);
 
   // Grab chain Contexts
   const sendChain = wh.getChain(options.sendChain);
@@ -132,7 +132,7 @@ async function tokenTransfer(
     xfer.transfer
   );
   console.log(quote);
-  return;
+  // return;
  
 
   if (!options.execute)
@@ -162,28 +162,19 @@ async function tokenTransfer(
   console.log('Completing Transfer');
   const destTxids = await xfer.completeTransfer(route.destination.signer);
   console.log(`Completed Transfer: `, destTxids);
-
-  // If no need to send back, dip
-  if (!roundTrip) return xfer;
-
-  const { destinationToken: token } = quote;
-  return await tokenTransfer(wh, {
-    ...route,
-    token: token.token,
-    amount: token.amount,
-    source: route.destination,
-    destination: route.source,
-  });
 };
 
 startbridge({
   sendChain: "Solana",
   rcvChain: "Sui",
-  amount: 0.93474452,
+  amount: 1,
   solprivatekey: process.env.solanaprivatekey,
   suiprivatekey: process.env.suimnemonic,
-  execute: false
+  execute: true
 });
+
+// Bridge cost: Sui .0057122
+// Sol 0.0000375025
 
 // module.exports = {
 //   startbridge

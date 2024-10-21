@@ -132,7 +132,7 @@ async function runbot(){
                     });
 
                     if(!destinationSwap.swapOutAmount){
-                        console.log("aborting cetus swap due to: ", destinationSwap);
+                        // console.log("aborting cetus swap due to: ", destinationSwap);
                         return;
                     };
 
@@ -142,7 +142,8 @@ async function runbot(){
                     let networkCost = Number(2*5000); // 2 signatures for bridge and swap 5000 lamports*2
                     let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolinfo.currentPriceOnSol);
                     // add the swap gas on destination chain
-                    networkCostInUsdc += (destinationSwap.gasUsed / (10 ** 9)) * poolInfoSui.suiNativePrice;
+                    networkCostInUsdc += (destinationSwap.gasUsed / 10 ** 9 + .0057122) * 2.1;
+
                     
                     console.log(`
                         amountIn: ${config.swapamount} usdc, 
@@ -238,7 +239,7 @@ async function runbot(){
                     });
 
                     if(!destinationSwap.swapOutAmount){
-                        console.log("aborting cetus swap due to: ", destinationSwap);
+                        // console.log("aborting cetus swap due to: ", destinationSwap);
                         return;
                     }
     
@@ -247,7 +248,8 @@ async function runbot(){
                     const outAmountInUsdc = (destinationSwap.swapOutAmount / 10 ** sol_pool.token_1_decimals);
                     let networkCost = Number(5000);
                     let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolinfo.currentPriceOnSol);
-                    networkCostInUsdc += ((sourceSwap.gasUsed) / (10 ** 9)) * 2.1;
+                    networkCostInUsdc += ((sourceSwap.gasUsed / 10 ** 9)) * 2.1;
+                    networkCostInUsdc += 0.0000375025 * poolInfoSol.currentPriceOnSol // Manual route bridge fee
                     // networkCostInUsdc += ((Number(bridgequote.relayFee.amount)) / (10 ** 8)) * poolInfoSui.currentPriceOnSui;
 
 
