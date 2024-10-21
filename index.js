@@ -247,7 +247,7 @@ async function runbot(){
                     const outAmountInUsdc = (destinationSwap.swapOutAmount / 10 ** sol_pool.token_1_decimals);
                     let networkCost = Number(5000);
                     let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolinfo.currentPriceOnSol);
-                    networkCostInUsdc += ((sourceSwap.gasUsed) / (10 ** 9)) * 2.1;
+                    networkCostInUsdc += ((sourceSwap.gasUsed) / (10 ** 9)) * 2.01;
                     // networkCostInUsdc += ((Number(bridgequote.relayFee.amount)) / (10 ** 8)) * poolInfoSui.currentPriceOnSui;
 
 
