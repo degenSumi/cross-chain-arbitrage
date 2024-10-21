@@ -181,7 +181,7 @@ async function runbot(){
                     // Execute the local swap and then bridge if the arbitrage is profitable
                     if (arbValueUSDC > .1) {
                         // Execute the source swap and bridge
-                        const tx = await web3.sendAndConfirmTransaction(connection, mainTx, [Keypair.fromSecretKey(new Uint8Array(bs58.decode(process.env.solanaprivatekey)))]);
+                        const tx = await web3.sendAndConfirmTransaction(connection, txBuffer, [Keypair.fromSecretKey(new Uint8Array(bs58.decode(process.env.solanaprivatekey)))]);
                         console.log("source swap executed:", tx);
                         const bridgeTx = await startbridge({
                             sendChain: "Solana",
