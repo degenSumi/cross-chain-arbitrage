@@ -56,16 +56,18 @@ async function swapOrca(connection, poolData){
       "2LecshUwdy9xi7meFgHtFJQNSKk4KdTrcpvaB56dP2NQ" // Nebula owning this and a lot of other pools
     );
 
+
+    const pool = poolData.pool_address;
     // tick spacing of the pool
-    let tickSpacing = 4;
+    // let tickSpacing = 4;
     
-    const pool = PDAUtil.getWhirlpool(
-        programId,
-        NEBULA_WHIRLPOOLS_CONFIG,
-        new web3.PublicKey(poolData.token_0 || "So11111111111111111111111111111111111111112"),
-        new web3.PublicKey(poolData.token_1 || "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-        tickSpacing
-    ).publicKey;
+    // const pool = PDAUtil.getWhirlpool(
+    //     programId,
+    //     NEBULA_WHIRLPOOLS_CONFIG,
+    //     new web3.PublicKey(poolData.token_0 || "So11111111111111111111111111111111111111112"),
+    //     new web3.PublicKey(poolData.token_1 || "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+    //     tickSpacing
+    // ).publicKey;
 
 
     const mainTx = new Transaction();
@@ -147,9 +149,9 @@ async function swapOrca(connection, poolData){
         true
       );
 
-      //   console.log(`amountIn: ${quote.estimatedAmountIn.toString()}
-      //   amountOut: ${quote.estimatedAmountOut.toString()}
-      //   amountOutImpact: ${quote.otherAmountThreshold.toString()}`);
+        // console.log(`amountIn: ${quote.estimatedAmountIn.toString()}
+        //   amountOut: ${quote.estimatedAmountOut.toString()}
+        //   amountOutImpact: ${quote.otherAmountThreshold.toString()}`);
 
 
       // get oracle for Orca

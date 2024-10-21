@@ -179,7 +179,7 @@ async function tokenTransfer(
 startbridge({
   sendChain: "Solana",
   rcvChain: "Sui",
-  amount: 0.934890025,
+  amount: 0.93474452,
   solprivatekey: process.env.solanaprivatekey,
   suiprivatekey: process.env.suimnemonic,
   execute: false

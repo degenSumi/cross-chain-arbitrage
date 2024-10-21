@@ -59,7 +59,7 @@ const sui_pool = {
 
 // template poolstate
 const poolInfoSol = {
-        currentPriceOnSol: 152.93974777457757, // data to init
+        currentPriceOnSol: 158.060008, // data to init
         reserve_0: '47715571943011',
         reserve_1: '10180367733395',
         pool_address: 'Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE',
@@ -92,7 +92,9 @@ async function runbot(){
     const listener = new Listener(connection);
     
     // Listening to any of the dexes clmm: orca,cetus amm: raydium v4
-    listener.subscribeToOrcaSinglePool(sol_pool);
+    // listener.subscribeToOrcaSinglePool(sol_pool);
+    listener.subscribeToOrcaPools(sol_pool);
+
     listener.pollSuiPoolChanges(sui_pool);
 
     // We can also use all the pools by listening using the methods: subscribeToOrcaPools subscribeToRaydiumPools of Listener, for the assesment using only single orca pool
@@ -101,7 +103,7 @@ async function runbot(){
         Object.assign(poolInfoSol, poolinfo);
         // console.log(poolInfoSol);
         // return;
-        const pricediff = poolInfoSol.currentPriceOnSol - poolInfoSui.currentPriceOnSui;
+        const pricediff = poolinfo.currentPriceOnSol - poolInfoSui.currentPriceOnSui;
         switch (true) {
             case Math.abs(pricediff) >= config.threshold && pricediff < 0:
                 // Case when we can bridge from solana to sui
@@ -110,7 +112,7 @@ async function runbot(){
                     const { swapOutAmount, txBuffer } = await swapOrca(connection, {
                         path: ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", "So11111111111111111111111111111111111111112"],
                         amountIn: config.swapamount * (10 **(sol_pool.token_1_decimals)),
-                        ...sol_pool
+                        ...poolinfo
                     });
        
                     // Get the bridge quote of sol<>wsol (solana-sui)
@@ -138,7 +140,7 @@ async function runbot(){
                     const outAmount = Number(bridgequote.destinationToken.amount);
                     const outAmountInUsdc = (destinationSwap.swapOutAmount / 10 ** sui_pool.token_1_decimals); // Sus slippage
                     let networkCost = Number(2*5000); // 2 signatures for bridge and swap 5000 lamports*2
-                    let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolInfoSol.currentPriceOnSol);
+                    let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolinfo.currentPriceOnSol);
                     // add the swap gas on destination chain
                     networkCostInUsdc += (destinationSwap.gasUsed / (10 ** 9)) * poolInfoSui.suiNativePrice;
                     
@@ -149,7 +151,7 @@ async function runbot(){
                         destinationAmountSol: ${outAmount / 10**8}, 
                         networkCostInUsdc: ${networkCostInUsdc}, 
                         pricediff: ${pricediff} usdc per SOL
-                        priceSol: ${poolInfoSol.currentPriceOnSol}
+                        priceSol: ${poolinfo.currentPriceOnSol}
                         priceSui: ${poolInfoSui.currentPriceOnSui}
                   `);
                   
@@ -177,7 +179,7 @@ async function runbot(){
                     }
     
                     // Execute the local swap and then bridge if the arbitrage is profitable
-                    if (arbValueUSDC > 3) {
+                    if (arbValueUSDC > .1) {
                         // Execute the source swap and bridge
                         const tx = await web3.sendAndConfirmTransaction(connection, mainTx, [Keypair.fromSecretKey(new Uint8Array(bs58.decode(process.env.solanaprivatekey)))]);
                         console.log("source swap executed:", tx);
@@ -206,7 +208,7 @@ async function runbot(){
                         }, bridgequote.eta);
                     }
                 } catch (error) {
-                    console.error("Error during bridge operation:", error);
+                    // console.error("Error during bridge operation:", error);
                 }
                 break;
             case Math.abs(pricediff) >= config.threshold && pricediff > 0:
@@ -232,7 +234,7 @@ async function runbot(){
                      const destinationSwap = await swapOrca(connection, {
                         path: ["So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"],
                         amountIn:  Number(bridgequote.destinationToken.amount),
-                        ...sol_pool
+                        ...poolinfo
                     });
 
                     if(!destinationSwap.swapOutAmount){
@@ -244,7 +246,7 @@ async function runbot(){
                     const outAmount = Number(bridgequote.destinationToken.amount);
                     const outAmountInUsdc = (destinationSwap.swapOutAmount / 10 ** sol_pool.token_1_decimals);
                     let networkCost = Number(5000);
-                    let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolInfoSol.currentPriceOnSol);
+                    let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolinfo.currentPriceOnSol);
                     networkCostInUsdc += ((sourceSwap.gasUsed) / (10 ** 9)) * 2.1;
                     // networkCostInUsdc += ((Number(bridgequote.relayFee.amount)) / (10 ** 8)) * poolInfoSui.currentPriceOnSui;
 
@@ -257,7 +259,7 @@ async function runbot(){
                         destinationAmountSol: ${outAmount / 10**9}, 
                         networkCostInUsdc: ${networkCostInUsdc}, 
                         pricediff: ${pricediff} usdc per SOL
-                        priceSol: ${poolInfoSol.currentPriceOnSol}
+                        priceSol: ${poolinfo.currentPriceOnSol}
                         priceSui: ${poolInfoSui.currentPriceOnSui}
                     `);
                   
@@ -284,10 +286,10 @@ async function runbot(){
                         console.log(chalk.green(`🚀 Arbitrage Opportunity Detected! 
                         - Estimated Profit: **${arbValueUSDC.toFixed(3)} USDC**
                         - Trade Amount: **${config.swapamount.toFixed(2)} ${config.token}**`));
-                        // await bactestData(arbValueUSDC);
+                        await bactestData(arbValueUSDC);
                     }       
                     // Execute the local swap and then bridge if the arbitrage is profitable
-                    if (arbValueUSDC > 3) {
+                    if (arbValueUSDC > .1) {
                         const srcTx = await swapCetus({
                             a2b: false,
                             amountIn: config.swapamount / (10 **(sui_pool.token_1_decimals)),
@@ -321,7 +323,7 @@ async function runbot(){
                     }
 
                 } catch (error) {
-                    console.error("Error during bridge operation:", error);
+                    // console.error("Error during bridge operation:", error);
                 }
                 break;
         }

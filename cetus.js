@@ -138,7 +138,7 @@ async function swapCetus(poolData){
         console.log('swap: ', transferTxn);
         return transferTxn;
     } catch(error){
-        console.log(error);
+        // console.log(error);
         return error;
     }
 };

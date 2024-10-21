@@ -10,15 +10,15 @@ const bs58 = require('bs58');
 //     "finalized"
 // );
 
-const sol_pool = {
-    pool_address: "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
-    token_0: "So11111111111111111111111111111111111111112",
-    token_0_decimals: 9,
-    token_1: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-    token_1_decimals: 6,
-    token_vault_a: "EUuUbDcafPrmVTD5M6qoJAoyyNbihBhugADAxRMn5he9", // for calculating price impact and slippage
-    token_vault_b: "2WLWEuKDgkDUccTpbwYp1GToYktiSB1cXvreHUwiSUVP"
-};
+// const sol_pool = {
+//     pool_address: "7xuPLn8Bun4ZGHeD95xYLnPKReKtSe7zfVRzRJWJZVZW",
+//     token_0: "So11111111111111111111111111111111111111112",
+//     token_0_decimals: 9,
+//     token_1: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+//     token_1_decimals: 6,
+//     token_vault_a: "EUuUbDcafPrmVTD5M6qoJAoyyNbihBhugADAxRMn5he9", // for calculating price impact and slippage
+//     token_vault_b: "2WLWEuKDgkDUccTpbwYp1GToYktiSB1cXvreHUwiSUVP"
+// };
 
 class Listener extends EventEmitter {
     connection;
@@ -82,11 +82,11 @@ class Listener extends EventEmitter {
                     });
                    
                 } catch (error) {
-                    console.error('Error fetching object state:', error);
+                    // console.error('Error fetching object state:', error);
                 }
             };
             // Poll every 1 second
-            setInterval(poll, 1000);
+            setInterval(poll, 10000);
         } catch (error) {
             console.error('Error setting up polling:', error);
         }
