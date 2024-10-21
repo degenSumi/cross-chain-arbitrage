@@ -142,7 +142,7 @@ async function runbot(){
                     let networkCost = Number(2*5000); // 2 signatures for bridge and swap 5000 lamports*2
                     let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolinfo.currentPriceOnSol);
                     // add the swap gas on destination chain
-                    networkCostInUsdc += (destinationSwap.gasUsed / 10 ** 9 + .0057122) * 2.1;
+                    networkCostInUsdc += ((destinationSwap.gasUsed / 10 ** 9) + .0057122) * 2.1; // Manual route bridging fee on destination
 
                     
                     console.log(`
@@ -180,9 +180,9 @@ async function runbot(){
                     }
     
                     // Execute the local swap and then bridge if the arbitrage is profitable
-                    if (arbValueUSDC > .1) {
+                    if (arbValueUSDC > 3) {
                         // Execute the source swap and bridge
-                        const tx = await web3.sendAndConfirmTransaction(connection, mainTx, [Keypair.fromSecretKey(new Uint8Array(bs58.decode(process.env.solanaprivatekey)))]);
+                        const tx = await web3.sendAndConfirmTransaction(connection, txBuffer, [Keypair.fromSecretKey(new Uint8Array(bs58.decode(process.env.solanaprivatekey)))]);
                         console.log("source swap executed:", tx);
                         const bridgeTx = await startbridge({
                             sendChain: "Solana",
@@ -248,8 +248,8 @@ async function runbot(){
                     const outAmountInUsdc = (destinationSwap.swapOutAmount / 10 ** sol_pool.token_1_decimals);
                     let networkCost = Number(5000);
                     let networkCostInUsdc = (networkCost / 10 ** 9) * Number(poolinfo.currentPriceOnSol);
-                    networkCostInUsdc += ((sourceSwap.gasUsed / 10 ** 9)) * 2.1;
-                    networkCostInUsdc += 0.0000375025 * poolInfoSol.currentPriceOnSol // Manual route bridge fee
+                    networkCostInUsdc += ((sourceSwap.gasUsed / 10 ** 9)) * 2.01;
+                    networkCostInUsdc += 0.0000375025 * poolInfoSol.currentPriceOnSol // Manual route bridge fee on destination
                     // networkCostInUsdc += ((Number(bridgequote.relayFee.amount)) / (10 ** 8)) * poolInfoSui.currentPriceOnSui;
 
 
@@ -291,7 +291,7 @@ async function runbot(){
                         await bactestData(arbValueUSDC);
                     }       
                     // Execute the local swap and then bridge if the arbitrage is profitable
-                    if (arbValueUSDC > .1) {
+                    if (arbValueUSDC > 3) {
                         const srcTx = await swapCetus({
                             a2b: false,
                             amountIn: config.swapamount / (10 **(sui_pool.token_1_decimals)),
