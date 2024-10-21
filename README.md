@@ -21,8 +21,6 @@ USDC prices are monitored in the SOL/USDC pool (other pairs can be configured). 
    - Bridge SOL to the destination chain.
    - Convert SOL back to USDC to generate more profit than initially deployed.
    
-   Native swapping on the source chain can be skipped, and SOL can be sent directly to the destination chain to swap for USDC. While native swapping is not yet implemented, the cost of swapping is taken into account.
-   
 3. **Cost Consideration**: The bot factors in bridging costs, network gas fees, and other expenses before executing trades.
    
 4. **Recursive Execution**: If a profit is still available after the first trade, the bot continues to bridge and trade as it monitors all the pools in realtime.
