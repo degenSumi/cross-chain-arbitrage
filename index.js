@@ -97,7 +97,7 @@ async function runbot(){
 
     listener.pollSuiPoolChanges(sui_pool);
 
-    // We can also use all the pools by listening using the methods: subscribeToOrcaPools subscribeToRaydiumPools of Listener, for the assesment using only single orca pool
+    // We can also use all the pools by listening using the methods: subscribeToOrcaPools subscribeToRaydiumPools of Listener, using only single orca pool
     
     listener.on("solpool", async (poolinfo) => {
         Object.assign(poolInfoSol, poolinfo);
