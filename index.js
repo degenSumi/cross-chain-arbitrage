@@ -155,7 +155,7 @@ async function runbot(){
                         priceSui: ${poolInfoSui.currentPriceOnSui}
                   `);
                   
-                    // No need now already impact price quotation above, Get the impact price clmm:
+                    // depreceated now, as already using impact price quotation above, Get the impact price clmm:
                     // const priceImpact = (outAmount / Number(poolInfoSui.liquidity)) * Number(poolInfoSui.currentPriceOnSui); // Price change due to the swap
                     // const newPrice = Number(poolInfoSui.currentPriceOnSui) + priceImpact * 0.001; // New price after the swap
                     // const outAmountInUsdcImpact = (outAmount / 10 ** Number(sui_pool.token_0_decimals)) * Number(newPrice);
@@ -264,7 +264,7 @@ async function runbot(){
                     `);
                   
 
-                    // No need now, already the impact price quotation above, Get the impact price clmm:
+                    // depreceated now, as already using the impact price quotation above, Get the impact price clmm:
                     // Get the impact price clmm
                     // const priceImpact = (outAmount / Number(poolInfoSol.liquidity)) * Number(poolInfoSol.currentPriceOnSol); // Price change due to the swap
                     // const newPrice = Number(poolInfoSol.currentPriceOnSol) + priceImpact * 0.1; // New price after the swap
