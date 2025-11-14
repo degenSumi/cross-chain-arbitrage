@@ -1,6 +1,5 @@
 const { Connection, Keypair } = require("@solana/web3.js");
 const { web3 } = require("@project-serum/anchor");
-const { SuiClient } = require("@mysten/sui/client");
 const { Listener } = require("./listeners");
 const { startbridge } = require("./wormhole");
 const { swapOrca } = require("./orca");
@@ -8,34 +7,7 @@ const { swapCetus } = require("./cetus");
 const chalk = require("chalk");
 const config = require("./config.json");
 const dotenv = require("dotenv");
-const fs = require("fs");
-const path = require("path");
 dotenv.config();
-
-const jsonFilePath = path.join(__dirname, "backtest.json");
-
-// To backtest the startegy
-async function bactestData(arbValueUSDC) {
-  const timestamp = new Date().toISOString();
-
-  // Appending data
-  let data = [];
-  try {
-    const fileContent = await fs.promises.readFile(jsonFilePath, "utf-8");
-    data = JSON.parse(fileContent);
-  } catch (error) {
-    console.error("Could not read the JSON file:", error);
-  }
-
-  data.push({ timestamp, arbValueUSDC });
-
-  try {
-    await fs.promises.writeFile(jsonFilePath, JSON.stringify(data, null, 2));
-    console.log("data added to backtest");
-  } catch (error) {
-    console.error("Could not write to the JSON file:", error);
-  }
-}
 
 // sol-usdc orca pool to perform arbitrage on, additionally we can also use all pools of sol-usdc on orca/raydium
 const sol_pool = {
