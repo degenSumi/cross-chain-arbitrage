@@ -1,230 +1,227 @@
 const { web3, AnchorProvider, Program, BN } = require("@project-serum/anchor");
-const { TOKEN_PROGRAM_ID,
-  createAssociatedTokenAccountInstruction, createSyncNativeInstruction,
-  createCloseAccountInstruction, NATIVE_MINT }
-  = require("@solana/spl-token");
-const { buildWhirlpoolClient, PDAUtil, swapQuoteByInputToken, WhirlpoolContext } = require("@orca-so/whirlpools-sdk");
+const {
+  TOKEN_PROGRAM_ID,
+  createAssociatedTokenAccountInstruction,
+  createSyncNativeInstruction,
+  NATIVE_MINT,
+} = require("@solana/spl-token");
+const {
+  buildWhirlpoolClient,
+  PDAUtil,
+  swapQuoteByInputToken,
+  WhirlpoolContext,
+} = require("@orca-so/whirlpools-sdk");
 const { deriveATA, Percentage } = require("@orca-so/common-sdk");
-const { Transaction, SystemProgram, Keypair  } = require('@solana/web3.js');
+const { Transaction, SystemProgram, Keypair } = require("@solana/web3.js");
 const bs58 = require("bs58");
 const idl = require("./artifacts/orca.json");
-require('dotenv').config();
+require("dotenv").config();
 
 const solrpc = process.env.solanarpc;
 const suirpc = process.env.suirpc;
 const solprivatekey = process.env.solanaprivatekey;
 const suiprivatekey = process.env.suimnemonic;
 
-const connection = new web3.Connection(
-    solrpc,
-    "finalized"
-);
+const connection = new web3.Connection(solrpc, "finalized");
 
-async function swapOrca(connection, poolData){
-    
-    const { path, amountIn } = poolData;
-    let { slippage } = poolData;
+async function swapOrca(connection, poolData) {
+  const { path, amountIn } = poolData;
+  let { slippage } = poolData;
 
-    slippage = new BN(Math.ceil(slippage));
+  slippage = new BN(Math.ceil(slippage));
 
-    // Create Anchor provider
-    const provider = new AnchorProvider(connection, {}, {});
+  // Create Anchor provider
+  const provider = new AnchorProvider(connection, {}, {});
 
-    // Initialize the Program
-    const programId = new web3.PublicKey(
-      "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
-    );
-    const program = new Program(idl, programId, provider);
+  // Initialize the Program
+  const programId = new web3.PublicKey(
+    "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+  );
+  const program = new Program(idl, programId, provider);
 
-    // Create the WhirpoolContext
-    const context = WhirlpoolContext.withProvider(provider, programId);
-    const client = buildWhirlpoolClient(context);
+  // Create the WhirpoolContext
+  const context = WhirlpoolContext.withProvider(provider, programId);
+  const client = buildWhirlpoolClient(context);
 
-    const keypair =  Keypair.fromSecretKey(new Uint8Array(bs58.decode(solprivatekey)));
-    // const keypair = { publicKey: new web3.PublicKey("BjGQ8huJUPL6LF6cxHtg4Rj8vreJKcEYBQ7NpmCStMY9")};
+  const keypair = Keypair.fromSecretKey(
+    new Uint8Array(bs58.decode(solprivatekey))
+  );
+  // const keypair = { publicKey: new web3.PublicKey("BjGQ8huJUPL6LF6cxHtg4Rj8vreJKcEYBQ7NpmCStMY9")};
 
-    const inputToken =  new web3.PublicKey(path[0]);
-    const outputToken = new web3.PublicKey(path[1]);
+  const inputToken = new web3.PublicKey(path[0]);
+  const outputToken = new web3.PublicKey(path[1]);
 
-    // Calculate Input amount
-    const inputAmount = new BN(amountIn);
+  // Calculate Input amount
+  const inputAmount = new BN(amountIn);
 
-    // Set the slippage
-    slippage = Percentage.fromFraction(slippage || .1, 100);
+  // Set the slippage
+  slippage = Percentage.fromFraction(slippage || 0.1, 100);
 
-    const NEBULA_WHIRLPOOLS_CONFIG = new web3.PublicKey(
-      "2LecshUwdy9xi7meFgHtFJQNSKk4KdTrcpvaB56dP2NQ" // Nebula owning this and a lot of other pools
-    );
+  const NEBULA_WHIRLPOOLS_CONFIG = new web3.PublicKey(
+    "2LecshUwdy9xi7meFgHtFJQNSKk4KdTrcpvaB56dP2NQ" // Nebula owning this and a lot of other pools
+  );
 
+  const pool = poolData.pool_address;
+  // tick spacing of the pool
+  // let tickSpacing = 4;
 
-    const pool = poolData.pool_address;
-    // tick spacing of the pool
-    // let tickSpacing = 4;
-    
-    // const pool = PDAUtil.getWhirlpool(
-    //     programId,
-    //     NEBULA_WHIRLPOOLS_CONFIG,
-    //     new web3.PublicKey(poolData.token_0 || "So11111111111111111111111111111111111111112"),
-    //     new web3.PublicKey(poolData.token_1 || "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-    //     tickSpacing
-    // ).publicKey;
+  // const pool = PDAUtil.getWhirlpool(
+  //     programId,
+  //     NEBULA_WHIRLPOOLS_CONFIG,
+  //     new web3.PublicKey(poolData.token_0 || "So11111111111111111111111111111111111111112"),
+  //     new web3.PublicKey(poolData.token_1 || "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+  //     tickSpacing
+  // ).publicKey;
 
+  const mainTx = new Transaction();
 
-    const mainTx = new Transaction();
+  // Derive ATA of the Tokens
+  const [outputTokenATA, inputTokenATA] = await Promise.all([
+    deriveATA(keypair.publicKey, outputToken),
+    deriveATA(keypair.publicKey, inputToken),
+  ]);
 
-    // Derive ATA of the Tokens
-    const [outputTokenATA, inputTokenATA] = await Promise.all([
-      deriveATA(keypair.publicKey, outputToken),
-      deriveATA(keypair.publicKey, inputToken)
-    ]);
+  const [accInfoFirst, accInfoSecond] = await Promise.all([
+    provider.connection.getAccountInfo(inputTokenATA),
+    provider.connection.getAccountInfo(outputTokenATA),
+  ]);
 
-    const [accInfoFirst, accInfoSecond] = await Promise.all([
-      provider.connection.getAccountInfo(inputTokenATA),
-      provider.connection.getAccountInfo(outputTokenATA)
-    ]);
+  try {
+    // Whirpool Object for Interacion
+    const whirlpool = await client.getPool(pool);
 
-    try {
-
-      // Whirpool Object for Interacion
-      const whirlpool = await client.getPool(pool);
-
-      if (!accInfoFirst) {
-        mainTx.add(
-          createAssociatedTokenAccountInstruction(
-            keypair.publicKey,
-            inputTokenATA,
-            keypair.publicKey,
-            inputToken
-          ),
-          SystemProgram.transfer({
-            fromPubkey: keypair.publicKey,
-            toPubkey: inputTokenATA,
-            lamports: Number(2000000+inputAmount), // Will work for wrapping sol<>wsol
-          })
-        );
-        if (inputToken.toBase58() === NATIVE_MINT.toBase58()) {
-          mainTx.add(
-            createSyncNativeInstruction(
-              inputTokenATA
-            )
-          );
-        }
-      }
-
-      if (!accInfoSecond) {
-        mainTx.add(
-          createAssociatedTokenAccountInstruction(
-            keypair.publicKey,
-            outputTokenATA,
-            keypair.publicKey,
-            outputToken
-          ),
-          SystemProgram.transfer({
-            fromPubkey: keypair.publicKey,
-            toPubkey: outputTokenATA,
-            lamports: 2000000,
-          })
-        );
-        if (outputToken.toBase58() === NATIVE_MINT.toBase58()) {
-          mainTx.add(
-            createSyncNativeInstruction(
-              outputTokenATA
-            )
-          );
-        }
-      }
-
-      // Fetch token Details
-      // const outputTokenATAAccount = await context.fetcher.getTokenInfo(outputTokenATA);
-      // const inputTokenATAAccount = await context.fetcher.getTokenInfo(inputTokenATA);
-
-      // get swap quote
-      const quote = await swapQuoteByInputToken(
-        whirlpool,
-        inputToken,
-        inputAmount,
-        slippage,
-        context.program.programId,
-        context.fetcher,
-        true
-      );
-
-        // console.log(`amountIn: ${quote.estimatedAmountIn.toString()}
-        //   amountOut: ${quote.estimatedAmountOut.toString()}
-        //   amountOutImpact: ${quote.otherAmountThreshold.toString()}`);
-
-
-      // get oracle for Orca
-      const oracle = PDAUtil.getOracle(programId, whirlpool.getAddress()).publicKey;
-
-      // Build the swap_transaction
-      const swapTransaction = await program.methods
-        .swap(
-          quote.amount,
-          quote.otherAmountThreshold,
-          quote.sqrtPriceLimit,
-          quote.amountSpecifiedIsInput,
-          quote.aToB
-        )
-        .accounts({
-          tokenProgram: TOKEN_PROGRAM_ID,
-          tokenAuthority: keypair.publicKey,
-          whirlpool: whirlpool.getAddress(),
-          tokenVaultA: whirlpool.getData().tokenVaultA,
-          tokenVaultB: whirlpool.getData().tokenVaultB,
-          tokenOwnerAccountA: path[0] === (whirlpool.getData().tokenMintA).toBase58() ? inputTokenATA : outputTokenATA,
-          tokenOwnerAccountB: path[0] === (whirlpool.getData().tokenMintA).toBase58() ? outputTokenATA : inputTokenATA,
-          tickArray0: quote.tickArray0,
-          tickArray1: quote.tickArray1,
-          tickArray2: quote.tickArray2,
-          oracle,
+    if (!accInfoFirst) {
+      mainTx.add(
+        createAssociatedTokenAccountInstruction(
+          keypair.publicKey,
+          inputTokenATA,
+          keypair.publicKey,
+          inputToken
+        ),
+        SystemProgram.transfer({
+          fromPubkey: keypair.publicKey,
+          toPubkey: inputTokenATA,
+          lamports: Number(2000000 + inputAmount), // Will work for wrapping sol<>wsol
         })
-        .instruction();
-
-      mainTx.add(swapTransaction);
-
-
-      // If you need SOL instead of wsol, not needed for current requirement
-      //   if (inputToken.mint.toBase58() === NATIVE_MINT.toBase58() && closeWSolAccount) {
-      //     mainTx.add(createCloseAccountInstruction(
-      //       // TOKEN_PROGRAM_ID,
-      //       inputTokenATA,
-      //       keypair,
-      //       keypair
-      //     ));
-      //   }
-
-      //   if (outputToken.mint.toBase58() === NATIVE_MINT.toBase58() && closeWSolAccount) {
-      //     mainTx.add(createCloseAccountInstruction(
-      //       // TOKEN_PROGRAM_ID,
-      //       outputTokenATA,
-      //       keypair,
-      //       keypair
-      //     ));
-      //   }
-
-
-      // If you need to sign it offline
-      // const { blockhash } = await connection.getLatestBlockhash('finalized');
-      // mainTx.recentBlockhash = blockhash;
-      // mainTx.feePayer = keypair.publicKey;
-
-      // const transactionBuffer = mainTx.serialize({
-      //   requireAllSignatures: false,
-      //   verifySignatures: false
-      // });
-
-      // const txBuffer =  Buffer.from(transactionBuffer).toString("base64");
-
-      //   console.log(txBuffer);
-
-      // Return the transaction
-      return { swapOutAmount: quote.otherAmountThreshold, txBuffer: mainTx};
-
-    } catch (error) {
-      return error;
+      );
+      if (inputToken.toBase58() === NATIVE_MINT.toBase58()) {
+        mainTx.add(createSyncNativeInstruction(inputTokenATA));
+      }
     }
-};
+
+    if (!accInfoSecond) {
+      mainTx.add(
+        createAssociatedTokenAccountInstruction(
+          keypair.publicKey,
+          outputTokenATA,
+          keypair.publicKey,
+          outputToken
+        ),
+        SystemProgram.transfer({
+          fromPubkey: keypair.publicKey,
+          toPubkey: outputTokenATA,
+          lamports: 2000000,
+        })
+      );
+      if (outputToken.toBase58() === NATIVE_MINT.toBase58()) {
+        mainTx.add(createSyncNativeInstruction(outputTokenATA));
+      }
+    }
+
+    // Fetch token Details
+    // const outputTokenATAAccount = await context.fetcher.getTokenInfo(outputTokenATA);
+    // const inputTokenATAAccount = await context.fetcher.getTokenInfo(inputTokenATA);
+
+    // get swap quote
+    const quote = await swapQuoteByInputToken(
+      whirlpool,
+      inputToken,
+      inputAmount,
+      slippage,
+      context.program.programId,
+      context.fetcher,
+      true
+    );
+
+    // console.log(`amountIn: ${quote.estimatedAmountIn.toString()}
+    //   amountOut: ${quote.estimatedAmountOut.toString()}
+    //   amountOutImpact: ${quote.otherAmountThreshold.toString()}`);
+
+    // get oracle for Orca
+    const oracle = PDAUtil.getOracle(
+      programId,
+      whirlpool.getAddress()
+    ).publicKey;
+
+    // Build the swap_transaction
+    const swapTransaction = await program.methods
+      .swap(
+        quote.amount,
+        quote.otherAmountThreshold,
+        quote.sqrtPriceLimit,
+        quote.amountSpecifiedIsInput,
+        quote.aToB
+      )
+      .accounts({
+        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenAuthority: keypair.publicKey,
+        whirlpool: whirlpool.getAddress(),
+        tokenVaultA: whirlpool.getData().tokenVaultA,
+        tokenVaultB: whirlpool.getData().tokenVaultB,
+        tokenOwnerAccountA:
+          path[0] === whirlpool.getData().tokenMintA.toBase58()
+            ? inputTokenATA
+            : outputTokenATA,
+        tokenOwnerAccountB:
+          path[0] === whirlpool.getData().tokenMintA.toBase58()
+            ? outputTokenATA
+            : inputTokenATA,
+        tickArray0: quote.tickArray0,
+        tickArray1: quote.tickArray1,
+        tickArray2: quote.tickArray2,
+        oracle,
+      })
+      .instruction();
+
+    mainTx.add(swapTransaction);
+
+    // If you need SOL instead of wsol, not needed for current requirement
+    //   if (inputToken.mint.toBase58() === NATIVE_MINT.toBase58() && closeWSolAccount) {
+    //     mainTx.add(createCloseAccountInstruction(
+    //       // TOKEN_PROGRAM_ID,
+    //       inputTokenATA,
+    //       keypair,
+    //       keypair
+    //     ));
+    //   }
+
+    //   if (outputToken.mint.toBase58() === NATIVE_MINT.toBase58() && closeWSolAccount) {
+    //     mainTx.add(createCloseAccountInstruction(
+    //       // TOKEN_PROGRAM_ID,
+    //       outputTokenATA,
+    //       keypair,
+    //       keypair
+    //     ));
+    //   }
+
+    // If you need to sign it offline
+    // const { blockhash } = await connection.getLatestBlockhash('finalized');
+    // mainTx.recentBlockhash = blockhash;
+    // mainTx.feePayer = keypair.publicKey;
+
+    // const transactionBuffer = mainTx.serialize({
+    //   requireAllSignatures: false,
+    //   verifySignatures: false
+    // });
+
+    // const txBuffer =  Buffer.from(transactionBuffer).toString("base64");
+
+    // Return the transaction
+    return { swapOutAmount: quote.otherAmountThreshold, txBuffer: mainTx };
+  } catch (error) {
+    return error;
+  }
+}
 
 // swapOrca(connection, {
 //     path: ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", "So11111111111111111111111111111111111111112"],
@@ -239,5 +236,5 @@ async function swapOrca(connection, poolData){
 // });
 
 module.exports = {
-    swapOrca
-}
+  swapOrca,
+};
