@@ -9,7 +9,8 @@ const config = require("./config.json");
 const dotenv = require("dotenv");
 dotenv.config();
 
-// sol-usdc orca pool to perform arbitrage on, additionally we can also use all pools of sol-usdc on orca/raydium
+// sol-usdc orca pool to perform arbitrage on
+// additionally we can also use all pools of sol-usdc on orca/raydium
 const sol_pool = {
   pool_address: "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE",
   token_0: "So11111111111111111111111111111111111111112",
@@ -67,8 +68,8 @@ async function runbot() {
 
   listener.pollSuiPoolChanges(sui_pool);
 
-  // We can also use all the pools by listening using the methods: subscribeToOrcaPools subscribeToRaydiumPools of Listener, using only single orca pool
-
+  // We can also use all the pools by using
+  // subscribeToOrcaPools, subscribeToRaydiumPools of Listener
   listener.on("solpool", async (poolinfo) => {
     Object.assign(poolInfoSol, poolinfo);
     // console.log(poolInfoSol);
@@ -133,7 +134,8 @@ async function runbot() {
                   `);
 
           // depreceated now, as already using impact price quotation above, Get the impact price clmm:
-          // const priceImpact = (outAmount / Number(poolInfoSui.liquidity)) * Number(poolInfoSui.currentPriceOnSui); // Price change due to the swap
+          // const priceImpact = (outAmount / Number(poolInfoSui.liquidity)) * Number(poolInfoSui.currentPriceOnSui); 
+          // Price change due to the swap
           // const newPrice = Number(poolInfoSui.currentPriceOnSui) + priceImpact * 0.001; // New price after the swap
           // const outAmountInUsdcImpact = (outAmount / 10 ** Number(sui_pool.token_0_decimals)) * Number(newPrice);
 
@@ -151,7 +153,6 @@ async function runbot() {
                 config.token
               }**`)
             );
-            // await bactestData(arbValueUSDC);
           } else {
             console.log(
               chalk.green(`🚀 Arbitrage Opportunity Detected! 
@@ -160,7 +161,6 @@ async function runbot() {
                 config.token
               }**`)
             );
-            // await bactestData(arbValueUSDC);
           }
 
           // Execute the local swap and then bridge if the arbitrage is profitable
@@ -201,7 +201,7 @@ async function runbot() {
             }, bridgequote.eta);
           }
         } catch (error) {
-          // console.error("Error during bridge operation:", error);
+          console.error("Error during bridge operation:", error);
         }
         break;
       case Math.abs(pricediff) >= config.threshold && pricediff > 0:
@@ -261,7 +261,8 @@ async function runbot() {
 
           // depreceated now, as already using the impact price quotation above, Get the impact price clmm:
           // Get the impact price clmm
-          // const priceImpact = (outAmount / Number(poolInfoSol.liquidity)) * Number(poolInfoSol.currentPriceOnSol); // Price change due to the swap
+          // const priceImpact = (outAmount / Number(poolInfoSol.liquidity)) * Number(poolInfoSol.currentPriceOnSol); 
+          // Price change due to the swap
           // const newPrice = Number(poolInfoSol.currentPriceOnSol) + priceImpact * 0.1; // New price after the swap
           // const outAmountInUsdcImpact = (outAmount / 10 ** Number(sol_pool.token_0_decimals)) * Number(newPrice);
 
