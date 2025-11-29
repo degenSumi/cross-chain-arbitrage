@@ -53,54 +53,6 @@ class Listener extends EventEmitter {
       }
     );
   }
-  // polling sui pool change
-  async pollSuiPoolChanges(sui_pool) {
-    // as event listening is depreceated on sui, fallback to polling
-    const client = new SuiClient({
-      url: "https://fullnode.mainnet.sui.io:443",
-    });
-    try {
-      const poll = async () => {
-        try {
-          const result = await client.getObject({
-            options: { showContent: true, showDisplay: true },
-            id: sui_pool.pool_address,
-          });
-          const nativeprice = await client.getObject({
-            options: { showContent: true, showDisplay: true },
-            id: "0xb8d7d9e66a60c239e7a60110efcf8de6c705580ed924d0dde141f4a0e2c90105",
-          });
-
-          const { current_sqrt_price, coin_a, coin_b, liquidity } =
-            result.data.content.fields;
-          const currentPrice =
-            Math.pow(Number(current_sqrt_price) / Math.pow(2, 64), 2) *
-            Math.pow(10, sui_pool.token_0_decimals - sui_pool.token_1_decimals);
-          // console.log("current Price: ", currentPrice, coin_a, coin_b);
-          const nativePool = nativeprice.data.content.fields;
-          let suiUsdc =
-            Math.pow(
-              Number(nativePool.current_sqrt_price) / Math.pow(2, 64),
-              2
-            ) * Math.pow(10, 6 - 9);
-          this.emit("suipool", {
-            currentPriceOnSui: currentPrice,
-            reserve_0: coin_a,
-            reserve_1: coin_b,
-            pool_address: sui_pool.pool_address,
-            liquidity,
-            suiNativePrice: suiUsdc,
-          });
-        } catch (error) {
-          // console.error('Error fetching object state:', error);
-        }
-      };
-      // Poll every 1 second
-      setInterval(poll, 10000);
-    } catch (error) {
-      console.error("Error setting up polling:", error);
-    }
-  }
   // Listening to any sol-usdc raydium pool
   async subscribeToRaydiumPools() {
     return this.connection.onProgramAccountChange(
@@ -162,6 +114,52 @@ class Listener extends EventEmitter {
       ]
     );
   }
+  // polling sui pool change
+  async pollSuiPoolChanges(sui_pool) {
+    const client = new SuiClient({
+      url: "https://fullnode.mainnet.sui.io:443",
+    });
+    try {
+      const poll = async () => {
+        try {
+          const result = await client.getObject({
+            options: { showContent: true, showDisplay: true },
+            id: sui_pool.pool_address,
+          });
+          const nativeprice = await client.getObject({
+            options: { showContent: true, showDisplay: true },
+            id: "0xb8d7d9e66a60c239e7a60110efcf8de6c705580ed924d0dde141f4a0e2c90105",
+          });
+
+          const { current_sqrt_price, coin_a, coin_b, liquidity } =
+            result.data.content.fields;
+          const currentPrice =
+            Math.pow(Number(current_sqrt_price) / Math.pow(2, 64), 2) *
+            Math.pow(10, sui_pool.token_0_decimals - sui_pool.token_1_decimals);
+          const nativePool = nativeprice.data.content.fields;
+          let suiUsdc =
+            Math.pow(
+              Number(nativePool.current_sqrt_price) / Math.pow(2, 64),
+              2
+            ) * Math.pow(10, 6 - 9);
+          this.emit("suipool", {
+            currentPriceOnSui: currentPrice,
+            reserve_0: coin_a,
+            reserve_1: coin_b,
+            pool_address: sui_pool.pool_address,
+            liquidity,
+            suiNativePrice: suiUsdc,
+          });
+        } catch (error) {
+          console.error('Error fetching object state:', error);
+        }
+      };
+      // Poll every 1 second
+      setInterval(poll, 10000);
+    } catch (error) {
+      console.error("Error setting up polling:", error);
+    }
+  }
   // Listening to any orca sol-usdc pool
   async subscribeToOrcaPools(sol_pool) {
     return this.connection.onProgramAccountChange(
@@ -217,15 +215,6 @@ class Listener extends EventEmitter {
     );
   }
 }
-
-// let listener = new Listener(connection);
-// listener.subscribeToOrcaSinglePool(sol_pool);
-// listener.pollSuiPoolChanges(sui_pool);
-// listener.subscribeToOrcaPools(sol_pool);
-// listener.subscribeToRaydiumPools();
-
-// listener.on('solpool', console.log);
-// listener.on('suipool', console.log);
 
 module.exports = {
   Listener,
