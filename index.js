@@ -133,7 +133,8 @@ async function runbot() {
                         priceSui: ${poolInfoSui.currentPriceOnSui}
                   `);
 
-          // depreceated now, as already using impact price quotation above, Get the impact price clmm:
+          // depreceated, as already using impact price quotation above
+          // Get the impact price clmm:
           // const priceImpact = (outAmount / Number(poolInfoSui.liquidity)) * Number(poolInfoSui.currentPriceOnSui); 
           // Price change due to the swap
           // const newPrice = Number(poolInfoSui.currentPriceOnSui) + priceImpact * 0.001; // New price after the swap
@@ -259,13 +260,6 @@ async function runbot() {
                         priceSui: ${poolInfoSui.currentPriceOnSui}
                     `);
 
-          // depreceated now, as already using the impact price quotation above, Get the impact price clmm:
-          // Get the impact price clmm
-          // const priceImpact = (outAmount / Number(poolInfoSol.liquidity)) * Number(poolInfoSol.currentPriceOnSol); 
-          // Price change due to the swap
-          // const newPrice = Number(poolInfoSol.currentPriceOnSol) + priceImpact * 0.1; // New price after the swap
-          // const outAmountInUsdcImpact = (outAmount / 10 ** Number(sol_pool.token_0_decimals)) * Number(newPrice);
-
           // Calculate arbitrage value
           // const swapvalueInUsdc = poolInfoSui.currentPriceOnSui * config.swapamount;
           const swapvalueInUsdc = config.swapamount;
@@ -280,7 +274,6 @@ async function runbot() {
                 config.token
               }**`)
             );
-            // await bactestData(arbValueUSDC);
           } else {
             console.log(
               chalk.green(`🚀 Arbitrage Opportunity Detected! 
@@ -289,7 +282,6 @@ async function runbot() {
                 config.token
               }**`)
             );
-            await bactestData(arbValueUSDC);
           }
           // Execute the local swap and then bridge if the arbitrage is profitable
           if (arbValueUSDC > 0.1) {
@@ -334,7 +326,7 @@ async function runbot() {
             }, bridgequote.eta);
           }
         } catch (error) {
-          // console.error("Error during bridge operation:", error);
+          console.error("Error during bridge operation:", error);
         }
         break;
     }
