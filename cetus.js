@@ -59,18 +59,12 @@ async function swapCetus(poolData){
         const sdk = new CetusClmmSDK(clmmMainnet);
         let sendKeypair = Ed25519Keypair.deriveKeypair(process.env.suimnemonic);
         let a2b = poolData.a2b;
-        if(a2b)
-          sdk.senderAddress =  "0xa27e93e635b9c68b422b72f01a34d6219ec6ed4c27fae5390d69de38fda641dd" // for testing otherwise use: 
-        else
-          sdk.senderAddress =  "0x52b2248a0105b42b050c9a6f6fc825cb6833e16192e482f8f6870683bcce58ba" // for testing otherwise use: 
-        // sdk.senderAddress = sendKeypair.getPublicKey().toSuiAddress(); // use this for swapping
+        sdk.senderAddress = sendKeypair.getPublicKey().toSuiAddress();
         const byAmountIn = true;
         const amount = poolData.amountIn || "100000";
         const slippage = Percentage.fromDecimal(d(0.1))
 
         const currentPool = await sdk.Pool.getPool('0x9ddb0d269d1049caf7c872846cc6d9152618d1d3ce994fae84c1c051ee23b179'); // SOL-USDC bridged
-        // console.log('currentPool: ', currentPool)
-
         const decimalsA = 8
         const decimalsB = 6
         const res = await sdk.Swap.preswap({
@@ -85,33 +79,9 @@ async function swapCetus(poolData){
             amount,
         })
 
-        // console.log('res', {
-        //     estimatedAmountIn: res.estimatedAmountIn.toString(),
-        //     estimatedAmountOut: res.estimatedAmountOut.toString(),
-        //     estimatedEndSqrtprice: res.estimatedEndSqrtPrice.toString(),
-        //     estimatedFeeAmount: res.estimatedFeeAmount.toString(),
-        //     isExceed: res.isExceed,
-        //     a2b,
-        //     byAmountIn,
-        // })
-
         const toAmount = byAmountIn ? new BN(res.estimatedAmountOut) : new BN(res.estimatedAmountIn)
 
         const amountLimit = adjustForSlippage(toAmount, slippage, !byAmountIn)
-
-        // let swapPayload = await sdk.Swap.createSwapTransactionPayload({
-        //     pool_id: currentPool.poolAddress,
-        //     a2b,
-        //     by_amount_in: byAmountIn,
-        //     amount: amount.toString(),
-        //     amount_limit: amountLimit.toString(),
-        //     coinTypeA: currentPool.coinTypeA,
-        //     coinTypeB: currentPool.coinTypeB,
-        // })
-         // console.log(swapPayload)
-        // printTransaction(swapPayload);
-        // const simulate = await sdk.fullClient.devInspectTransactionBlock({transactionBlock:swapPayload, sender: sdk.senderAddress })
-
 
         let swapPayload = await sdk.Swap.createSwapTransactionWithoutTransferCoinsPayload({
             pool_id: currentPool.poolAddress,
@@ -127,27 +97,24 @@ async function swapCetus(poolData){
         TransactionUtil.buildTransferCoinToSender(sdk, swapPayload.tx, swapPayload.coinABs[1], currentPool.coinTypeB)
 
 
-        // printTransaction(swapPayload.tx);
         const simulate = await sdk.fullClient.devInspectTransactionBlock({transactionBlock:swapPayload.tx, sender: sdk.senderAddress })
-        // console.log(simulate.effects.gasUsed);
-        // console.log((Number(simulate.effects.gasUsed.computationCost) + Number(simulate.effects.gasUsed.storageCost) - Number(simulate.effects.gasUsed.storageRebate)));
         
-        if(!poolData.execute)
-            return { swapOutAmount: res.estimatedAmountOut, txBuffer: swapPayload.tx, gasUsed: (Number(simulate.effects.gasUsed.computationCost) + Number(simulate.effects.gasUsed.storageCost) - Number(simulate.effects.gasUsed.storageRebate)) };
+        if(!poolData.execute) {
+            return { 
+                swapOutAmount: res.estimatedAmountOut, 
+                txBuffer: swapPayload.tx, 
+                gasUsed: (Number(simulate.effects.gasUsed.computationCost) 
+                          + Number(simulate.effects.gasUsed.storageCost) 
+                          - Number(simulate.effects.gasUsed.storageRebate)) 
+            };
+        }
         const transferTxn = await sdk.fullClient.sendTransaction(sendKeypair, swapPayload.tx)
         console.log('swap: ', transferTxn);
         return transferTxn;
     } catch(error){
-        // console.log(error);
         return error;
     }
 };
-
-// swapCetus({
-//     a2b: false,
-//     amountIn: "158228357",
-//     execute: false
-// });
 
 module.exports= {
     swapCetus
